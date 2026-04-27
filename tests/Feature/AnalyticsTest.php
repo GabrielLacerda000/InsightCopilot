@@ -1,5 +1,6 @@
 <?php
 
+use App\Ai\Agents\SqlGeneratorAgent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -23,13 +24,18 @@ it('redirects unauthenticated users from analytics ask', function () {
     $this->postJson(route('analytics.ask'), ['question' => 'test'])->assertUnauthorized();
 });
 
-it('returns empty sql and data for authenticated ask request', function () {
+it('returns sql and data for authenticated ask request', function () {
+    SqlGeneratorAgent::fake(['SELECT COUNT(*) as total FROM customers']);
+
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->postJson(route('analytics.ask'), ['question' => 'Show MRR by month'])
         ->assertOk()
-        ->assertJson(['sql' => '', 'data' => []]);
+        ->assertJsonStructure(['sql', 'data'])
+        ->assertJsonPath('sql', 'SELECT COUNT(*) as total FROM customers');
+
+    SqlGeneratorAgent::assertPrompted('Show MRR by month');
 });
 
 it('validates question is required on ask', function () {

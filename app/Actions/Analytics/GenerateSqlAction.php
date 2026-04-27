@@ -2,11 +2,15 @@
 
 namespace App\Actions\Analytics;
 
+use App\Ai\Agents\SqlGeneratorAgent;
+use App\Services\SchemaContextService;
+
 class GenerateSqlAction
 {
     public static function run(string $question): string
     {
-        // TODO: Integrate AI in Step 7
-        return '';
+        $agent = new SqlGeneratorAgent(app(SchemaContextService::class));
+
+        return trim($agent->prompt($question)->text);
     }
 }
