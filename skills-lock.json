@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "spatie-javascript": {
+      "source": "spatie/guidelines-skills",
+      "sourceType": "github",
+      "computedHash": "b4c9eccb092c67c525ca54036eb54cb6ea60b2e5095a3f0812484003e26efb0a"
+    },
+    "spatie-laravel-php": {
+      "source": "spatie/guidelines-skills",
+      "sourceType": "github",
+      "computedHash": "ae6e0970e318dd9102444c745ca65590aec7d72cbcbaf049ee2eb9e1f800b519"
+    },
+    "spatie-security": {
+      "source": "spatie/guidelines-skills",
+      "sourceType": "github",
+      "computedHash": "cf641f59012e70a6f5636f48eee5b3b95f04c44df618685ef0a33f619cd80a7e"
+    }
+  }
+}
