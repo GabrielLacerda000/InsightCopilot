@@ -1,6 +1,9 @@
 <?php
 
+use App\Actions\Analytics\RunQueryAction;
 use App\Ai\Agents\SqlGeneratorAgent;
+use App\Models\Company;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -45,4 +48,31 @@ it('validates question is required on ask', function () {
         ->postJson(route('analytics.ask'), [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['question']);
+});
+
+it('executes a safe select query and returns rows', function () {
+    $user = User::factory()->create();
+    $company = Company::factory()->create(['user_id' => $user->id]);
+    Customer::factory()->create(['company_id' => $company->id, 'email' => 'alice@example.com']);
+
+    $result = RunQueryAction::run('SELECT id, email FROM customers LIMIT 1');
+
+    expect($result)->toBeArray()->toHaveCount(1)
+        ->and($result[0])->toHaveKeys(['id', 'email']);
+});
+
+it('throws on forbidden sql statements', function (string $sql) {
+    expect(fn () => RunQueryAction::run($sql))
+        ->toThrow(RuntimeException::class, 'Forbidden SQL statement');
+})->with([
+    'UPDATE customers SET email = "x" WHERE 1=1',
+    'DELETE FROM customers',
+    'INSERT INTO customers (email) VALUES ("x")',
+    'DROP TABLE customers',
+]);
+
+it('appends limit when query has none', function () {
+    $result = RunQueryAction::run('SELECT COUNT(*) as total FROM customers');
+
+    expect($result)->toBeArray();
 });
