@@ -15,16 +15,25 @@ const textarea = ref<HTMLTextAreaElement | null>(null);
 
 function autoResize() {
     const el = textarea.value;
-    if (!el) return;
+
+    if (!el) {
+        return;
+    }
+
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
 function handleSubmit() {
     const trimmed = question.value.trim();
-    if (!trimmed || props.loading) return;
+
+    if (!trimmed || props.loading) {
+        return;
+    }
+
     emit('submit', trimmed);
     question.value = '';
+
     if (textarea.value) {
         textarea.value.style.height = 'auto';
     }
@@ -46,14 +55,14 @@ function handleKeydown(e: KeyboardEvent) {
                 v-model="question"
                 rows="1"
                 placeholder="Ask anything about your data..."
-                class="flex-1 resize-none bg-transparent text-sm leading-relaxed text-brand-body-strong placeholder:text-brand-muted-soft outline-none"
+                class="flex-1 resize-none bg-transparent text-sm text-start leading-relaxed text-brand-body-strong placeholder:text-brand-muted-soft outline-none"
                 style="max-height: 120px"
                 :disabled="loading"
                 @input="autoResize"
                 @keydown="handleKeydown"
             />
             <button
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all cursor-pointer"
                 :class="
                     question.trim() && !loading
                         ? 'bg-brand-primary text-brand-on-primary hover:bg-brand-primary-active'

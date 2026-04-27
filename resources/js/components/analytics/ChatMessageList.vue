@@ -33,7 +33,6 @@ watch(
             </div>
             <div>
                 <p class="font-semibold text-brand-body-strong">Ask anything about your data</p>
-                <p class="mt-1 text-sm text-brand-muted">I'll generate and run the SQL query for you.</p>
             </div>
         </div>
 
