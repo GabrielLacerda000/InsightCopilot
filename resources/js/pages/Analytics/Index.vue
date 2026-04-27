@@ -57,6 +57,7 @@ async function handleSubmit(question: string) {
         const result: AskResponse = await response.json();
 
         const index = messages.value.findIndex((m) => m.id === placeholderId);
+
         if (index !== -1) {
             messages.value[index] = {
                 id: placeholderId,
@@ -68,6 +69,7 @@ async function handleSubmit(question: string) {
         }
     } catch {
         const index = messages.value.findIndex((m) => m.id === placeholderId);
+
         if (index !== -1) {
             messages.value[index] = {
                 id: placeholderId,
