@@ -13,6 +13,37 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    /* Brand color system — ClickHouse-inspired dark theme */
+
+    /* Canvas & surfaces (darkest → lightest) */
+    --color-brand-canvas: #0a0a0a;        /* page background */
+    --color-brand-surface-deep: #0f0f0f;  /* code blocks, inset areas */
+    --color-brand-surface-soft: #121212;  /* very subtle section tints, footers */
+    --color-brand-surface-card: #1a1a1a;  /* feature cards, message bubbles */
+    --color-brand-surface-row: #1e1e1e;   /* alternating table rows */
+    --color-brand-surface-elevated: #242424; /* nested cards, table headers, hover */
+
+    /* Borders */
+    --color-brand-hairline: #2a2a2a;      /* default card/input border */
+    --color-brand-hairline-strong: #3a3a3a; /* heavier dividers */
+
+    /* Brand accent — electric yellow */
+    --color-brand-primary: #faff69;       /* CTAs, send button, stat callouts */
+    --color-brand-primary-active: #e6eb52; /* hover / pressed state of primary */
+    --color-brand-on-primary: #0a0a0a;   /* text on yellow backgrounds */
+
+    /* Typography */
+    --color-brand-on-dark: #ffffff;       /* headlines on dark canvas */
+    --color-brand-body-strong: #e6e6e6;  /* emphasized body text */
+    --color-brand-body: #cccccc;          /* default running text */
+    --color-brand-muted: #888888;         /* captions, labels, secondary info */
+    --color-brand-muted-soft: #5a5a5a;   /* hints, disabled text, placeholders */
+
+    /* Semantic states */
+    --color-brand-success: #22c55e;       /* active status, success indicators */
+    --color-brand-error: #ef4444;         /* errors, down indicators */
+    --color-brand-info: #3b82f6;          /* info states, code syntax */
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
