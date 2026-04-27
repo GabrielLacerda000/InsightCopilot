@@ -1,11 +1,12 @@
 <?php
 
-use App\Actions\Analytics\RunQueryAction;
 use App\Ai\Agents\SqlGeneratorAgent;
+use App\Ai\Tools\RunQueryTool;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Ai\Tools\Request;
 
 uses(RefreshDatabase::class);
 
@@ -27,16 +28,16 @@ it('redirects unauthenticated users from analytics ask', function () {
     $this->postJson(route('analytics.ask'), ['question' => 'test'])->assertUnauthorized();
 });
 
-it('returns sql and data for authenticated ask request', function () {
-    SqlGeneratorAgent::fake(['SELECT COUNT(*) as total FROM customers']);
+it('returns sql, data and text for authenticated ask request', function () {
+    SqlGeneratorAgent::fake(['Here are the results.']);
 
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->postJson(route('analytics.ask'), ['question' => 'Show MRR by month'])
         ->assertOk()
-        ->assertJsonStructure(['sql', 'data'])
-        ->assertJsonPath('sql', 'SELECT COUNT(*) as total FROM customers');
+        ->assertJsonStructure(['sql', 'data', 'text'])
+        ->assertJsonPath('text', 'Here are the results.');
 
     SqlGeneratorAgent::assertPrompted('Show MRR by month');
 });
@@ -50,20 +51,30 @@ it('validates question is required on ask', function () {
         ->assertJsonValidationErrors(['question']);
 });
 
+// RunQueryTool unit tests
+
 it('executes a safe select query and returns rows', function () {
     $user = User::factory()->create();
     $company = Company::factory()->create(['user_id' => $user->id]);
     Customer::factory()->create(['company_id' => $company->id, 'email' => 'alice@example.com']);
 
-    $result = RunQueryAction::run('SELECT id, email FROM customers LIMIT 1');
+    $tool = new RunQueryTool;
+    $tool->handle(new Request(['sql' => 'SELECT id, email FROM customers LIMIT 1']));
 
-    expect($result)->toBeArray()->toHaveCount(1)
-        ->and($result[0])->toHaveKeys(['id', 'email']);
+    expect($tool->lastData)->toBeArray()->toHaveCount(1)
+        ->and($tool->lastData[0])->toHaveKeys(['id', 'email'])
+        ->and($tool->lastSql)->toContain('customers');
 });
 
-it('throws on forbidden sql statements', function (string $sql) {
-    expect(fn () => RunQueryAction::run($sql))
-        ->toThrow(RuntimeException::class, 'Forbidden SQL statement');
+it('returns error json for forbidden sql statements', function (string $sql) {
+    $tool = new RunQueryTool;
+    $result = json_decode(
+        $tool->handle(new Request(['sql' => $sql])),
+        true
+    );
+
+    expect($result)->toHaveKey('error')
+        ->and($result['error'])->toBe('Forbidden SQL statement');
 })->with([
     'UPDATE customers SET email = "x" WHERE 1=1',
     'DELETE FROM customers',
@@ -71,8 +82,10 @@ it('throws on forbidden sql statements', function (string $sql) {
     'DROP TABLE customers',
 ]);
 
-it('appends limit when query has none', function () {
-    $result = RunQueryAction::run('SELECT COUNT(*) as total FROM customers');
+it('appends limit when query has none and stores results', function () {
+    $tool = new RunQueryTool;
+    $tool->handle(new Request(['sql' => 'SELECT COUNT(*) as total FROM customers']));
 
-    expect($result)->toBeArray();
+    expect($tool->lastSql)->toContain('LIMIT')
+        ->and($tool->lastData)->toBeArray();
 });
