@@ -1,101 +1,149 @@
-Perfeito. Vamos transformar isso num **roadmap executável**, em ordem certa, com entregas visíveis. A ideia é você conseguir publicar no GitHub em ~2 semanas trabalhando algumas horas por dia.
+Perfeito — vamos atualizar o roadmap inteiro para o **InsightCopilot focado em métricas SaaS** (MRR, churn, crescimento, assinaturas).
+Agora o roadmap deixa de falar de e-commerce e passa a refletir o produto real.
 
-Vou dividir em fases com *entregáveis claros* (muito importante pra manter motivação).
-
----
-
-# 🗺️ Roadmap – InsightCopilot MVP
-
-## ⏱️ Visão geral
-
-| Semana | Fase                  | Resultado visível            |
-| ------ | --------------------- | ---------------------------- |
-| 1      | Base + dataset        | App Laravel + dados reais    |
-| 2      | Agent SQL funcionando | Perguntas → tabela           |
-| 3      | Charts + resumo       | Perguntas → gráfico          |
-| 4      | Polimento + README    | Projeto pronto pra portfólio |
-
-Você pode fazer mais rápido, mas esse pacing é saudável.
+Vou manter o formato executável + entregáveis visíveis.
 
 ---
 
-# 🧱 FASE 1 — Fundação do projeto (Dia 1–2)
+# 🗺️ Roadmap – InsightCopilot (SaaS Conversational BI)
 
-Objetivo: deixar o projeto rodando com dados reais.
+## ⏱️ Visão geral realista
 
-## 1. Criar projeto Laravel + Inertia + Vue
+| Semana | Fase                       | Resultado visível               |
+| ------ | -------------------------- | ------------------------------- |
+| 1      | Base + dataset SaaS        | App rodando com dados realistas |
+| 2      | SQL Agent                  | Perguntas → tabela              |
+| 3      | Charts + insights          | Perguntas → gráficos + resumo   |
+| 4      | Conversational UI + polish | Projeto pronto para portfólio   |
 
-Entregável: app abre com página vazia.
+Se acelerar, dá pra fazer em 10–14 dias.
+
+---
+
+# 🧱 FASE 1 — Fundação SaaS (Dia 1–3)
+
+Objetivo: deixar o app rodando com **dados realistas de assinaturas**.
+
+Essa fase é subestimada — mas é o que vai fazer os gráficos parecerem reais.
+
+---
+
+## 1️⃣ Setup Laravel + Inertia + Vue
+
+**Entregável:** rota `/analytics` abrindo página vazia.
 
 Tarefas:
 
-* instalar Laravel 13
-* instalar Inertia v3
-* instalar Vue 3
-* instalar Tailwind (opcional mas recomendado)
-* criar página `/analytics`
+* Laravel 13
+* Inertia v3 + Vue 3
+* Tailwind (opcional, recomendado)
+* Criar página `Analytics/Index.vue`
 
-📌 Ao final você já tem UI básica.
+Resultado: app abre e navega.
 
 ---
 
-## 2. Configurar SQLite
+## 2️⃣ Configurar SQLite
 
-Entregável: app usando SQLite local.
+**Entregável:** app usando SQLite local.
 
 Tarefas:
 
-* criar database.sqlite
+* criar `database.sqlite`
 * configurar `.env`
-* rodar migrations
+* rodar migration inicial
+
+Zero infra = onboarding fácil para quem clonar o repo.
 
 ---
 
-## 3. Criar schema do sistema (empresa fake)
+## 3️⃣ Criar schema SaaS (core do projeto)
 
-Entregável: migrations criadas.
+**Entregável:** migrations prontas.
 
 Crie migrations para:
 
-* users
-* products
-* orders
-* order_items
+### companies
 
-💡 Dica estratégica: pense como SaaS de ecommerce.
+* id
+* user_id
+* name
+* created_at
+
+### customers
+
+* id
+* company_id
+* email
+* created_at
+* cancelled_at
+
+### subscription_plans
+
+* id
+* name
+* price_monthly
+
+### subscriptions
+
+* id
+* customer_id
+* plan_id
+* started_at
+* cancelled_at
+
+### invoices
+
+* id
+* customer_id
+* subscription_id
+* amount
+* status (paid/refunded)
+* paid_at
+
+Agora o banco já suporta métricas SaaS reais.
 
 ---
 
-## 4. Criar seed realista (ESSENCIAL)
+## 4️⃣ Criar seed realista (CRÍTICO)
 
-Essa etapa define o sucesso do agente.
+Este passo define o sucesso do agente.
 
-Entregável: banco com dados ricos.
+**Entregável:** banco com 12 meses de histórico SaaS.
 
-Seed com:
+Seed deve gerar:
 
-* 200–500 usuários
-* 20–30 produtos
-* 3–6 meses de pedidos
-* sazonalidade (meses com vendas maiores)
+* 1 empresa SaaS
+* 800–1500 usuários
+* 3 planos (Starter / Pro / Enterprise)
+* assinaturas mensais ao longo de 12 meses
+* cancelamentos distribuídos (churn realista)
+* invoices mensais recorrentes
+* crescimento gradual de usuários
 
-📌 Isso torna os gráficos interessantes.
+Simule:
+
+* crescimento mês a mês
+* alguns meses ruins
+* upgrades/downgrades simples
+
+📌 Sem isso, os gráficos ficam sem graça.
 
 ---
 
-# 🤖 FASE 2 — Motor de Analytics (Dia 3–6)
+# 🤖 FASE 2 — Motor Conversational SQL (Dia 4–7)
 
-Agora começa a parte de IA.
+Agora começa o coração do projeto.
 
 ---
 
-## 5. Criar estrutura Actions Pattern
+## 5️⃣ Criar estrutura Actions Pattern
 
-Entregável: pasta de analytics pronta.
+**Entregável:** pasta Analytics pronta.
 
-Crie:
+Criar:
 
-```text
+```
 app/Actions/Analytics
 ```
 
@@ -105,118 +153,123 @@ Actions iniciais:
 * GenerateSqlAction
 * RunQueryAction
 
-Ainda sem IA. Só estrutura.
+Ainda sem IA — só estrutura.
 
 ---
 
-## 6. Criar SchemaContextService
+## 6️⃣ Criar SchemaContextService
 
-Entregável: endpoint que retorna descrição do banco.
+**Entregável:** serviço que descreve o banco.
 
-Ele deve retornar texto tipo:
+Ele deve retornar texto assim:
 
 ```
 Tables:
-users(id, name, created_at)
-orders(id, user_id, total, created_at)
-...
+users(id, company_id, created_at, cancelled_at)
+subscriptions(id, user_id, plan_id, started_at, cancelled_at)
+subscription_plans(id, name, price_monthly)
+invoices(id, user_id, amount, status, paid_at)
 ```
 
-Isso será enviado ao agente.
+Esse texto alimenta o agente.
 
 ---
 
-## 7. Criar primeira versão do SQL Agent
+## 7️⃣ Criar SQL Agent (Laravel AI SDK)
 
-Entregável: pergunta → SQL.
+**Entregável:** pergunta → SQL.
 
 Fluxo:
-
 Controller → GenerateSqlAction → AI SDK → retorna SQL.
 
 Testar perguntas:
 
-* revenue by month
-* top products
-* new users per month
+* Show MRR by month
+* Active users per month
+* New subscriptions per month
 
-⚠️ Aqui o sistema ainda não executa query.
+⚠️ Ainda não executa query.
 
 ---
 
-## 8. Criar QueryTool segura
+## 8️⃣ Criar QueryTool segura
 
-Entregável: SQL executado com segurança.
+**Entregável:** SQL executado com segurança.
 
-Implementar validações:
+Implementar:
 
-* apenas SELECT
-* limitar rows
-* try/catch
+* bloquear UPDATE/DELETE/INSERT
+* limitar resultados
+* timeout
 * logs
 
-Agora fluxo vira:
+Agora temos:
 
-Pergunta → SQL → Executa → retorna tabela.
+Pergunta → SQL → Executa → tabela.
 
 🎉 PRIMEIRO GRANDE MARCO.
 
-Você já tem BI conversacional básico.
+Você já tem BI conversacional funcionando.
 
 ---
 
-# 📊 FASE 3 — Visualização (Dia 7–9)
+# 📊 FASE 3 — Visualização de métricas (Dia 8–10)
 
-Agora o projeto começa a brilhar.
+Agora o projeto começa a parecer SaaS de verdade.
 
 ---
 
-## 9. Instalar Apache ECharts no Vue
+## 9️⃣ Instalar Apache ECharts no Vue
 
-Entregável: renderizar gráfico fake.
+**Entregável:** componente de gráfico funcionando.
 
-Crie componente:
+Criar:
 
 ```
-ChartRenderer.vue
+components/ChartRenderer.vue
 ```
 
-Teste com dados mock.
+Testar com dados mock.
 
 ---
 
-## 10. Criar GenerateChartSpecAction (IA)
+## 🔟 Criar GenerateChartSpecAction (IA)
 
-Entregável: dados → config de gráfico.
+**Entregável:** dados → config de gráfico.
 
 Entrada:
 
 * pergunta
-* colunas da query
+* colunas retornadas
 
-Saída:
+Saída exemplo:
 
 ```json
-{ type, xField, yField, title }
+{
+ "type": "line",
+ "xField": "month",
+ "yField": "mrr",
+ "title": "MRR Growth"
+}
 ```
 
 ---
 
-## 11. Integrar ChartRenderer com resposta real
+## 11️⃣ Integrar gráficos com dados reais
 
-Entregável: pergunta → gráfico real 🎉
+**Entregável:** pergunta → gráfico real 🎉
 
-Agora a demo começa a impressionar.
-
----
-
-# ✍️ FASE 4 — Resumo Executivo (Dia 10–11)
-
-Isso transforma demo em produto.
+Agora a demo começa a impressionar de verdade.
 
 ---
 
-## 12. Criar GenerateSummaryAction
+# ✍️ FASE 4 — Insights automáticos (Dia 11–12)
+
+Aqui o projeto deixa de ser dashboard e vira **copiloto**.
+
+---
+
+## 12️⃣ Criar GenerateSummaryAction
 
 Entrada:
 
@@ -225,17 +278,19 @@ Entrada:
 
 Saída:
 
-* resumo textual executivo
+* resumo executivo
 
-Ex:
+Exemplo:
 
-> Revenue grew 18% compared to previous period.
+> MRR increased 21% over the last 6 months while churn decreased.
 
-Isso é MUITO diferencial.
+Esse detalhe muda totalmente a percepção do projeto.
 
 ---
 
-## 13. Orquestrar tudo no AskAnalyticsAction
+## 13️⃣ Orquestrar pipeline completo
+
+Finalizar `AskAnalyticsAction`.
 
 Pipeline final:
 
@@ -244,18 +299,17 @@ Pipeline final:
 3. gerar gráfico
 4. gerar resumo
 
-Entregável:
-Resposta completa JSON.
+**Entregável:** endpoint retorna resposta completa.
 
 ---
 
-# 💬 FASE 5 — UI Conversacional (Dia 12–13)
+# 💬 FASE 5 — UI Conversacional (Dia 13)
 
 Agora vira produto de verdade.
 
 ---
 
-## 14. Criar Chat UI
+## 14️⃣ Criar Chat UI
 
 Componentes:
 
@@ -263,19 +317,19 @@ Componentes:
 * Message
 * Loading state
 
-Histórico simples em memória (frontend).
+Histórico simples no frontend.
 
 ---
 
-## 15. Layout dividido
+## 15️⃣ Criar layout SaaS
 
 Tela final:
 
 ```
-| Chat | Gráfico + Tabela |
+| Chat | Chart + Table + Summary |
 ```
 
-Isso dá aparência de SaaS real.
+Agora parece ferramenta usada por founder.
 
 ---
 
@@ -285,7 +339,7 @@ Essa fase define impacto em entrevistas.
 
 ---
 
-## 16. Criar README forte
+## 16️⃣ Criar README forte
 
 Inclua:
 
@@ -297,16 +351,20 @@ Inclua:
 
 ---
 
-## 17. Criar perguntas demo
+## 17️⃣ Perguntas demo (ATUALIZADAS)
 
-No README:
+Coloque no README:
 
 Try asking:
 
-* Show revenue by month
-* Top 5 products
-* Revenue by category
-* New users per month
+* What is our MRR?
+* Show MRR growth over time
+* How many active users do we have?
+* What is the churn this month?
+* Which plan generates most revenue?
+* New subscriptions per month
+
+Essas perguntas vendem o produto instantaneamente.
 
 ---
 
@@ -314,10 +372,10 @@ Try asking:
 
 Você terá um app que:
 
-* conversa em linguagem natural
+* conversa sobre métricas SaaS
 * gera SQL automaticamente
 * executa no banco
 * cria gráficos automaticamente
-* escreve insights
+* escreve insights executivos
 
-Isso é MUITO além de CRUD.
+Isso posiciona você como alguém que sabe integrar **IA + dados + produto** — algo raro no portfólio.
