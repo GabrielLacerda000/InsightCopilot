@@ -31,10 +31,11 @@ class SqlGeneratorAgent implements Agent, HasTools
             ."Given the schema below, answer the user's analytics question by:\n"
             ."1. Writing a safe SELECT query\n"
             ."2. Executing it with the run_query tool\n"
-            ."3. Returning a concise answer based on the results\n\n"
+            ."3. Confirming the query executed (do NOT write any analysis or insight)\n\n"
             ."Rules:\n"
             ."- Only use SELECT statements\n"
-            ."- Always call run_query before responding\n\n"
+            ."- Always call run_query before responding\n"
+            ."- Your text response is discarded — focus entirely on executing the correct query\n\n"
             .$this->schema->describe();
     }
 

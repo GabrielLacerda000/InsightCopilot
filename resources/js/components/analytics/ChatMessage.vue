@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import DataTable from '@/components/analytics/DataTable.vue';
-import SqlBlock from '@/components/analytics/SqlBlock.vue';
 import type { Message } from '@/types/analytics';
 
 defineProps<{
@@ -46,8 +44,6 @@ defineProps<{
                 class="rounded-2xl border border-brand-hairline bg-brand-surface-card px-4 py-4"
             >
                 <p class="text-sm leading-relaxed text-brand-body">{{ message.content }}</p>
-                <SqlBlock v-if="message.sql" :sql="message.sql" />
-                <DataTable v-if="message.data && message.data.length > 0" :data="message.data" />
             </div>
         </div>
     </div>

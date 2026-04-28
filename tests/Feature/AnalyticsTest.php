@@ -1,5 +1,6 @@
 <?php
 
+use App\Ai\Agents\AnalyticsInsightAgent;
 use App\Ai\Agents\SqlGeneratorAgent;
 use App\Ai\Tools\RunQueryTool;
 use App\Models\Company;
@@ -29,7 +30,8 @@ it('redirects unauthenticated users from analytics ask', function () {
 });
 
 it('returns sql, data and text for authenticated ask request', function () {
-    SqlGeneratorAgent::fake(['Here are the results.']);
+    SqlGeneratorAgent::fake(['Query executed.']);
+    AnalyticsInsightAgent::fake(['MRR increased 21% over the last 6 months while churn decreased by 8%.']);
 
     $user = User::factory()->create();
 
@@ -37,9 +39,10 @@ it('returns sql, data and text for authenticated ask request', function () {
         ->postJson(route('analytics.ask'), ['question' => 'Show MRR by month'])
         ->assertOk()
         ->assertJsonStructure(['sql', 'data', 'text'])
-        ->assertJsonPath('text', 'Here are the results.');
+        ->assertJsonPath('text', 'MRR increased 21% over the last 6 months while churn decreased by 8%.');
 
     SqlGeneratorAgent::assertPrompted('Show MRR by month');
+    AnalyticsInsightAgent::assertPrompted(fn ($prompt) => str_contains($prompt->prompt, 'Show MRR by month'));
 });
 
 it('validates question is required on ask', function () {
