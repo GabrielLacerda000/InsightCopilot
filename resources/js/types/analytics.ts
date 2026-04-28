@@ -12,4 +12,11 @@ export type AskResponse = {
     sql: string;
     data: Record<string, unknown>[];
     text: string;
+    conversation_id: string;
+};
+
+export type Conversation = {
+    id: string;
+    title: string;
+    updated_at: string;
 };
